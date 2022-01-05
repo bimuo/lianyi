@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.ProductMapper">
+    
+    <resultMap type="Product" id="ProductResult">
+        <result property="id"    column="id"    />
+        <result property="drawNumber"    column="draw_number"    />
+        <result property="specifications"    column="specifications"    />
+        <result property="unit"    column="unit"    />
+        <result property="remark"    column="remark"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="total"    column="total"    />
+    </resultMap>
+	<resultMap id="productStoreResult" type="com.ruoyi.system.vo.ProductStore">
+        <id property="id" column="id"/>
+        <result property="productId" column="productId"/>
+        <result property="shelvesId" column="shelvesId"/>
+        <result property="name" column="name"/>
+        <result property="count" column="count"/>
+        <collection property="children" javaType="java.util.ArrayList" column="{productId=productId,shelvesId=shelvesId}"
+                    ofType="com.ruoyi.system.vo.ProductStore" select="childrenProductStoreSelect"></collection>
+	</resultMap>
+	<resultMap id="childrenProductStoreResult" type="com.ruoyi.system.vo.ProductStore">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="productId" column="productId"/>
+        <result property="shelvesId" column="shelvesId"/>
+        <result property="count" column="count"/>
+        <collection property="children" javaType="java.util.ArrayList" column="children"
+                    ofType="com.ruoyi.system.vo.ProductStore" select="childrenProductStoreSelect"></collection>
+	</resultMap>
+
+	<select id="getProductStoreById" resultMap="productStoreResult">
+			SELECT
+			  	max(id) as id,
+				t.name,
+				sum( t.count ) AS count,
+				t.sid shelvesId,
+				t.pid productId
+			FROM
+				(
+				SELECT
+					ps.id,
+					s.NAME,
+					ps.count,
+					s.id sid,
+					ps.product_id pid
+				FROM
+					product_shelves ps,
+					shelves_cell sc,
+					shelves s 
+				WHERE
+					ps.shelves_cell_id = sc.id 
+					AND sc.shelves_id = s.id 
+					AND ps.product_id = #{id} 
+				) t 
+			GROUP BY
+				t.sid
+	</select>
+	<select id="childrenProductStoreSelect" resultMap="childrenProductStoreResult">
+    	SELECT
+			ps.id,
+			c.name,
+			ps.count,
+			ps.product_id as productId,
+			c.shelves_id as shelvesId
+		FROM
+			product_shelves ps,shelves_cell c
+		WHERE
+			c.id = ps.shelves_cell_id AND ps.product_id = #{productId} AND c.shelves_id=#{shelvesId}
+    </select>
+    
+    <sql id="selectProductVo">
+        select id, draw_number, specifications, unit, remark, create_time, update_time, total from product
+    </sql>
+    
+    <select id="selectProductList" parameterType="Product" resultMap="ProductResult">
+       select p.id, p.draw_number, p.specifications, p.unit, p.remark, p.create_time, p.update_time, s.total from product p
+        
+		        left join (SELECT
+					product_id AS id, sum( count ) AS total 
+				FROM
+					product_shelves 
+				GROUP BY
+					product_id) s on p.id=s.id
+        <where>  
+            <if test="drawNumber != null  and drawNumber != ''"> and p.draw_number like concat('%', #{drawNumber}, '%')</if>
+            <if test="specifications != null  and specifications != ''"> and p.specifications like concat('%', #{specifications}, '%')</if>
+        </where>
+    </select>
+    
+    <select id="selectProductById" parameterType="Long" resultMap="ProductResult">
+        <include refid="selectProductVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertProduct" parameterType="Product">
+        insert into product
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="drawNumber != null">draw_number,</if>
+            <if test="specifications != null">specifications,</if>
+            <if test="unit != null">unit,</if>
+            <if test="remark != null">remark,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="total != null">total,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="drawNumber != null">#{drawNumber},</if>
+            <if test="specifications != null">#{specifications},</if>
+            <if test="unit != null">#{unit},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="total != null">#{total},</if>
+         </trim>
+    </insert>
+
+	<update id="output" parameterType="com.ruoyi.system.vo.ProductOuput">
+        update product_shelves
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="count != null">count = count - #{outputCount}</if>
+        </trim>
+        where id = #{id}
+    </update>
+    
+    <update id="updateProduct" parameterType="Product">
+        update product
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="drawNumber != null">draw_number = #{drawNumber},</if>
+            <if test="specifications != null">specifications = #{specifications},</if>
+            <if test="unit != null">unit = #{unit},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="total != null">total = #{total},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteProductById" parameterType="Long">
+        delete from product where id = #{id}
+    </delete>
+
+    <delete id="deleteProductByIds" parameterType="String">
+        delete from product where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

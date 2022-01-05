@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.ShelvesCellMapper">
+    
+    <resultMap type="ShelvesCell" id="ShelvesCellResult">
+        <result property="id"    column="id"    />
+        <result property="name"    column="name"    />
+        <result property="shelvesId"    column="shelves_id"    />
+    </resultMap>
+
+    <sql id="selectShelvesCellVo">
+        select id, name, shelves_id from shelves_cell
+    </sql>
+
+    <select id="selectShelvesCellList" parameterType="ShelvesCell" resultMap="ShelvesCellResult">
+        <include refid="selectShelvesCellVo"/>
+        <where>  
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="shelvesId != null "> and shelves_id = #{shelvesId}</if>
+        </where>
+    </select>
+    
+    <select id="selectShelvesCellById" parameterType="Long" resultMap="ShelvesCellResult">
+        <include refid="selectShelvesCellVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertShelvesCell" parameterType="ShelvesCell" useGeneratedKeys="true" keyProperty="id">
+        insert into shelves_cell
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null">name,</if>
+            <if test="shelvesId != null">shelves_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name != null">#{name},</if>
+            <if test="shelvesId != null">#{shelvesId},</if>
+         </trim>
+    </insert>
+
+    <update id="updateShelvesCell" parameterType="ShelvesCell">
+        update shelves_cell
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null">name = #{name},</if>
+            <if test="shelvesId != null">shelves_id = #{shelvesId},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteShelvesCellById" parameterType="Long">
+        delete from shelves_cell where id = #{id}
+    </delete>
+
+    <delete id="deleteShelvesCellByIds" parameterType="String">
+        delete from shelves_cell where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

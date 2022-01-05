@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.ProductShelvesMapper">
+    
+    <resultMap type="ProductShelves" id="ProductShelvesResult">
+        <result property="id"    column="id"    />
+        <result property="shelvesCellId"    column="shelves_cell_id"    />
+        <result property="productId"    column="product_id"    />
+        <result property="count"    column="count"    />
+    </resultMap>
+
+    <sql id="selectProductShelvesVo">
+        select id, shelves_cell_id, product_id, count from product_shelves
+    </sql>
+
+    <select id="selectProductShelvesList" parameterType="ProductShelves" resultMap="ProductShelvesResult">
+        <include refid="selectProductShelvesVo"/>
+        <where>  
+            <if test="shelvesCellId != null "> and shelves_cell_id = #{shelvesCellId}</if>
+            <if test="productId != null "> and product_id = #{productId}</if>
+        </where>
+    </select>
+    
+    <select id="selectProductShelvesById" parameterType="Long" resultMap="ProductShelvesResult">
+        <include refid="selectProductShelvesVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertProductShelves" parameterType="ProductShelves">
+        insert into product_shelves
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="shelvesCellId != null">shelves_cell_id,</if>
+            <if test="productId != null">product_id,</if>
+            <if test="count != null">count,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="shelvesCellId != null">#{shelvesCellId},</if>
+            <if test="productId != null">#{productId},</if>
+            <if test="count != null">#{count},</if>
+         </trim>
+    </insert>
+
+    <update id="updateProductShelves" parameterType="ProductShelves">
+        update product_shelves
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="shelvesCellId != null">shelves_cell_id = #{shelvesCellId},</if>
+            <if test="productId != null">product_id = #{productId},</if>
+            <if test="count != null">count = #{count},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteProductShelvesById" parameterType="Long">
+        delete from product_shelves where id = #{id}
+    </delete>
+
+    <delete id="deleteProductShelvesByIds" parameterType="String">
+        delete from product_shelves where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

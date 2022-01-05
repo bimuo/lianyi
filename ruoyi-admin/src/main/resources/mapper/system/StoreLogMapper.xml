@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.StoreLogMapper">
+    
+    <resultMap type="StoreLog" id="StoreLogResult">
+        <result property="id"    column="id"    />
+        <result property="type"    column="type"    />
+        <result property="productName"    column="productName"    />
+        <result property="shelvesName"    column="shelvesName"    />
+        <result property="shelvesCellName"    column="shelvesCellName"    />
+        <result property="productId"    column="product_id"    />
+        <result property="shelvesCellId"    column="shelves_cell_id"    />
+        <result property="count"    column="count"    />
+        <result property="createTime"    column="create_time"    />
+    </resultMap>
+
+    <sql id="selectStoreLogVo">
+        select id, type, product_id, shelves_cell_id, count, create_time from store_log
+    </sql>
+
+    <select id="selectStoreLogList" parameterType="StoreLog" resultMap="StoreLogResult">
+        SELECT l.id, l.type, l.product_id, l.shelves_cell_id, l.count , l.create_time, p.draw_number AS productName, sc.name AS shelvesCellName, s.name AS shelvesName FROM store_log l LEFT JOIN product p ON l.product_id = p.id LEFT JOIN shelves_cell sc ON l.shelves_cell_id = sc.id LEFT JOIN shelves s ON sc.shelves_id = s.id
+        <where>  
+            <if test="type != null "> and type = #{l.type}</if>
+            <if test="productId != null "> and l.product_id like concat('%', #{productId}, '%')</if>
+            <if test="shelvesCellId != null "> and l.shelves_cell_id = #{shelvesCellId}</if>
+        </where>
+    </select>
+    
+    <select id="selectStoreLogById" parameterType="Long" resultMap="StoreLogResult">
+        <include refid="selectStoreLogVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertStoreLog" parameterType="StoreLog">
+        insert into store_log
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="type != null">type,</if>
+            <if test="productId != null">product_id,</if>
+            <if test="shelvesCellId != null">shelves_cell_id,</if>
+            <if test="count != null">count,</if>
+            <if test="createTime != null">create_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="type != null">#{type},</if>
+            <if test="productId != null">#{productId},</if>
+            <if test="shelvesCellId != null">#{shelvesCellId},</if>
+            <if test="count != null">#{count},</if>
+            <if test="createTime != null">#{createTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateStoreLog" parameterType="StoreLog">
+        update store_log
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="type != null">type = #{type},</if>
+            <if test="productId != null">product_id = #{productId},</if>
+            <if test="shelvesCellId != null">shelves_cell_id = #{shelvesCellId},</if>
+            <if test="count != null">count = #{count},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteStoreLogById" parameterType="Long">
+        delete from store_log where id = #{id}
+    </delete>
+
+    <delete id="deleteStoreLogByIds" parameterType="String">
+        delete from store_log where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>
