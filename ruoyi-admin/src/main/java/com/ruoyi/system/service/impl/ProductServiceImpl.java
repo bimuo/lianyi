@@ -8,8 +8,10 @@ import org.springframework.stereotype.Service;
 
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.system.domain.Product;
+import com.ruoyi.system.domain.ProductShelves;
 import com.ruoyi.system.domain.StoreLog;
 import com.ruoyi.system.mapper.ProductMapper;
+import com.ruoyi.system.mapper.ProductShelvesMapper;
 import com.ruoyi.system.mapper.StoreLogMapper;
 import com.ruoyi.system.service.IProductService;
 import com.ruoyi.system.vo.ProductOuput;
@@ -28,6 +30,8 @@ public class ProductServiceImpl implements IProductService
     private ProductMapper productMapper;
     @Autowired
     private StoreLogMapper storeLogMapper;
+    @Autowired
+	private ProductShelvesMapper productShelvesMapper;
     /**
      * 查询商品
      * 
@@ -62,6 +66,16 @@ public class ProductServiceImpl implements IProductService
     public int insertProduct(Product product)
     {
         product.setCreateTime(DateUtils.getNowDate());
+        product.setDrawNumber(product.getDrawNumber()==null?"":product.getDrawNumber());
+        product.setSpecifications(product.getSpecifications()==null?"":product.getSpecifications());
+        Product findParams = new Product();
+        findParams.setDrawNumber(product.getDrawNumber());
+        findParams.setSpecifications(product.getSpecifications());
+        List<Product> ps = productMapper.selectrepeatProductList(findParams);
+        if(ps!=null && ps.size()>0) {
+        	return 0;
+        }
+        
         return productMapper.insertProduct(product);
     }
 
@@ -111,7 +125,18 @@ public class ProductServiceImpl implements IProductService
 	public int output(List<ProductOuput> list) {
 		int ret = 0;
 		for(ProductOuput ps:list) {
-			ret+=productMapper.output(ps);
+			ProductShelves p =new ProductShelves();
+			p.setShelvesCellId(ps.getShelvesId());
+			List<ProductShelves> plist = productShelvesMapper.selectProductShelvesList(p);
+			if(plist!=null && plist.size()>0) {
+				if(ps.getOutputCount()>plist.get(0).getCount()) {
+					throw new RuntimeException("出库数量不能大于库存");
+				}else if(ps.getOutputCount()==plist.get(0).getCount()) {
+					productShelvesMapper.deleteProductShelvesById(plist.get(0).getId());
+				}else {
+					ret+=productMapper.output(ps);
+				}
+			}
 			
 			StoreLog log=new StoreLog();
 			log.setProductId(ps.getProductId());

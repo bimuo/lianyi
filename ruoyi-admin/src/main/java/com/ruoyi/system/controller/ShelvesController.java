@@ -1,26 +1,29 @@
 package com.ruoyi.system.controller;
 
 import java.util.List;
+
 import javax.servlet.http.HttpServletResponse;
-import org.springframework.security.access.prepost.PreAuthorize;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
+import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.system.domain.Shelves;
 import com.ruoyi.system.service.IShelvesService;
 import com.ruoyi.system.vo.SelectTreeValue;
-import com.ruoyi.common.utils.poi.ExcelUtil;
-import com.ruoyi.common.core.page.TableDataInfo;
 
 /**
  * 货架Controller
@@ -34,7 +37,6 @@ public class ShelvesController extends BaseController
 {
     @Autowired
     private IShelvesService shelvesService;
-    
     /**
      * 查询货架列表
      */
@@ -42,6 +44,22 @@ public class ShelvesController extends BaseController
     @GetMapping("/list")
     public TableDataInfo list(Shelves shelves)
     {
+//    	for(int i=1;i<31;i++) {
+//    		for(int j=1;j<9;j++) {
+//    			Shelves ss = new Shelves();
+//    			ss.setName(String.format("%02d", i)+"-"+String.format("%02d", j));
+//    			shelvesService.insertShelves(ss);
+//    			for(int x=0;x<4;x++) {
+//    				for(int y=1;y<5;y++) {
+//    					ShelvesCell sc = new ShelvesCell();
+//    	    			sc.setName(x+"-"+y);
+//    	    			sc.setShelvesId(ss.getId());
+//    	    			shelvesCellService.insertShelvesCell(sc);
+//    				}
+//    			}
+//    			
+//    		}
+//    	}
         startPage();
         List<Shelves> list = shelvesService.selectShelvesList(shelves);
         return getDataTable(list);
@@ -51,6 +69,12 @@ public class ShelvesController extends BaseController
     public List<SelectTreeValue> tree()
     {
         return shelvesService.getShelvesTree();
+    }
+    
+    @GetMapping("/children-tree/{id}")
+    public List<SelectTreeValue> childrenTree(@PathVariable("id")Long id)
+    {
+        return shelvesService.getChildrenShelvesTree(id);
     }
 
     /**

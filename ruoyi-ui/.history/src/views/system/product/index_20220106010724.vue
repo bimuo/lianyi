@@ -147,8 +147,8 @@
       <el-form ref="formInput" :model="formInput" :rules="rulesInput" label-width="80px">
         <el-form-item label="货架" prop="shelvesCellId">
           <el-cascader
-            :props="shelvesTreeProps"
             v-model="formInput.shelvesCellId"
+            :options="shelvesOptions"
             separator="-"
             :emitPath="true"
             filterable
@@ -173,7 +173,6 @@
           style="width: 100%;margin-bottom: 20px;"
           row-key="id"
           border
-          default-expand-all="true"
           show-summary
           :tree-props="{children: 'children'}">
           <el-table-column
@@ -208,7 +207,7 @@
 
 <script>
 import { listProduct, getProduct, delProduct, addProduct, updateProduct, getProductStore, output } from "@/api/system/product";
-import { treeShelves,treeChildrenShelves } from "@/api/system/shelves";
+import { treeShelves } from "@/api/system/shelves";
 import { addProductshelves } from "@/api/system/productshelves";
 export default {
   name: "Product",
@@ -252,28 +251,6 @@ export default {
       formInput: {},
       formOutput: {},
       shelvesOptions: [],
-      shelvesTreeProps: {
-        lazy: true,
-        lazyLoad (node, resolve) {
-          const { level,root,data } = node;
-          if(root){
-            treeShelves().then((response) => {
-              response.map(item=>{
-                item.leaf=false;
-              });
-              resolve(response);
-            });
-          }else{
-            treeChildrenShelves(data.value).then((response) => {
-              response.map(item=>{
-                item.leaf=true;
-                item.disabled=(this.productIdByInput!=item.productId && item.productId);
-              });
-              resolve(response);
-            });
-          }
-        }
-      },
       // 表单校验
       rules: {
       },
@@ -388,12 +365,19 @@ export default {
     handleInput(row) {
       this.reset();
       const id = row.id || this.ids
-      this.productIdByInput = id;
       this.formInput.productId=id;
-      this.openInput = true;
-      this.title = "入库商品";
+      if(this.shelvesOptions.length>0){
+        this.openInput = true;
+        this.title = "入库商品";
+        return;
+      }
+      treeShelves().then((response) => {
+        this.openInput = true;
+        this.title = "入库商品";
+        this.shelvesOptions=response;
+        console.log(this.shelvesOptions);
+      });
     },
-
     /** 出库按钮操作 */
     handleOutput(row) {
       this.reset();

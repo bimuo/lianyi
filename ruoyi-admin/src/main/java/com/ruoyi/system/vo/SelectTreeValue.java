@@ -3,10 +3,28 @@ package com.ruoyi.system.vo;
 import java.util.List;
 
 public class SelectTreeValue {
+	
+	private Long productId;
 	private String label;
 	private String value;
-	
+	private boolean disabled;
 	private List<SelectTreeValue> children;
+
+	public Long getProductId() {
+		return productId;
+	}
+
+	public void setProductId(Long productId) {
+		this.productId = productId;
+	}
+
+	public boolean isDisabled() {
+		return disabled;
+	}
+
+	public void setDisabled(boolean disabled) {
+		this.disabled = disabled;
+	}
 
 	public String getLabel() {
 		return label;

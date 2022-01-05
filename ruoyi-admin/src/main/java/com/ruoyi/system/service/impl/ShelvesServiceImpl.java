@@ -1,14 +1,11 @@
 package com.ruoyi.system.service.impl;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.ruoyi.system.domain.Shelves;
-import com.ruoyi.system.domain.ShelvesCell;
-import com.ruoyi.system.mapper.ShelvesCellMapper;
 import com.ruoyi.system.mapper.ShelvesMapper;
 import com.ruoyi.system.service.IShelvesService;
 import com.ruoyi.system.vo.SelectTreeValue;
@@ -24,8 +21,6 @@ public class ShelvesServiceImpl implements IShelvesService
 {
     @Autowired
     private ShelvesMapper shelvesMapper;
-    @Autowired
-    private ShelvesCellMapper shelvesCellMapper;
 
     /**
      * 查询货架
@@ -101,29 +96,12 @@ public class ShelvesServiceImpl implements IShelvesService
 
 	@Override
 	public List<SelectTreeValue> getShelvesTree() {
-		List<SelectTreeValue> retsut = new ArrayList<>();
-		
-		Shelves shelves = new Shelves();
-		List<Shelves> list = this.selectShelvesList(shelves);
-		for(Shelves s : list) {
-			ShelvesCell sc = new ShelvesCell();
-			sc.setShelvesId(s.getId());
-			
-			SelectTreeValue stv = new SelectTreeValue();
-			stv.setLabel(s.getName());
-			stv.setValue(s.getId().toString());
-			List<SelectTreeValue> stvClients = new ArrayList<>();
-			stv.setChildren(stvClients);
-			
-			List<ShelvesCell> childs =  shelvesCellMapper.selectShelvesCellList(sc);
-			for(ShelvesCell c:childs) {
-				SelectTreeValue stvc = new SelectTreeValue();
-				stvc.setLabel(c.getName());
-				stvc.setValue(c.getId().toString()); 
-				stvClients.add(stvc);
-			}
-			retsut.add(stv);
-		}
+		List<SelectTreeValue> retsut = shelvesMapper.getShelvesTreeSelect();
 		return retsut;
+	}
+
+	@Override
+	public List<SelectTreeValue> getChildrenShelvesTree(Long id) {
+		return shelvesMapper.getChildrenProductStoreSelect(id);
 	}
 }

@@ -1,7 +1,9 @@
 package com.ruoyi.system.mapper;
 
 import java.util.List;
+
 import com.ruoyi.system.domain.Shelves;
+import com.ruoyi.system.vo.SelectTreeValue;
 
 /**
  * 货架Mapper接口
@@ -19,6 +21,9 @@ public interface ShelvesMapper
      */
     public Shelves selectShelvesById(Long id);
 
+    public List<SelectTreeValue> getShelvesTreeSelect();
+    
+    public List<SelectTreeValue> getChildrenProductStoreSelect(Long id);
     /**
      * 查询货架列表
      * 

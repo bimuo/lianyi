@@ -23,10 +23,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectStoreLogList" parameterType="StoreLog" resultMap="StoreLogResult">
         SELECT l.id, l.type, l.product_id, l.shelves_cell_id, l.count , l.create_time, p.draw_number AS productName, sc.name AS shelvesCellName, s.name AS shelvesName FROM store_log l LEFT JOIN product p ON l.product_id = p.id LEFT JOIN shelves_cell sc ON l.shelves_cell_id = sc.id LEFT JOIN shelves s ON sc.shelves_id = s.id
         <where>  
-            <if test="type != null "> and type = #{l.type}</if>
-            <if test="productId != null "> and l.product_id like concat('%', #{productId}, '%')</if>
+            <if test="type != null "> and l.type = #{type}</if>
+            <if test="productId != null "> and l.product_id = #{productId}</if>
+            <if test="productName != null "> and p.draw_number like concat('%', #{productName}, '%')</if>
             <if test="shelvesCellId != null "> and l.shelves_cell_id = #{shelvesCellId}</if>
         </where>
+        ORDER BY l.create_time DESC
     </select>
     
     <select id="selectStoreLogById" parameterType="Long" resultMap="StoreLogResult">

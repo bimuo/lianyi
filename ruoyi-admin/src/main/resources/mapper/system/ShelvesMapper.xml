@@ -8,7 +8,40 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="id"    column="id"    />
         <result property="name"    column="name"    />
     </resultMap>
-
+	<resultMap id="shelvesResult" type="com.ruoyi.system.vo.SelectTreeValue">
+        <id property="value" column="id"/>
+        <result property="label" column="name"/>
+        <result property="productId" column="productId"/>
+        <result property="count" column="count"/>
+        <result property="disabled" column="disabled"/>
+	</resultMap>
+	<resultMap id="childrenshelvesResult" type="com.ruoyi.system.vo.SelectTreeValue">
+        <id property="value" column="id"/>
+        <result property="label" column="name"/>
+        <result property="count" column="count"/>
+        <result property="disabled" column="disabled"/>
+	</resultMap>
+	<select id="getChildrenProductStoreSelect"  parameterType="Long" resultMap="childrenshelvesResult">
+    	SELECT
+			c.id,
+			c.name,
+			ps.product_id productId
+		FROM
+			shelves_cell c
+			LEFT JOIN product_shelves ps on c.id = ps.shelves_cell_id
+		WHERE
+			 c.shelves_id = #{id}
+    </select>
+    
+    <select id="getShelvesTreeSelect" resultMap="shelvesResult">
+    	SELECT
+			s.id,
+			s.name,
+			'' as productId
+		FROM
+			shelves s
+    </select>
+	
     <sql id="selectShelvesVo">
         select id, name from shelves
     </sql>

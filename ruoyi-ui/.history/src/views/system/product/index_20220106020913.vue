@@ -173,7 +173,6 @@
           style="width: 100%;margin-bottom: 20px;"
           row-key="id"
           border
-          default-expand-all="true"
           show-summary
           :tree-props="{children: 'children'}">
           <el-table-column
@@ -267,7 +266,7 @@ export default {
             treeChildrenShelves(data.value).then((response) => {
               response.map(item=>{
                 item.leaf=true;
-                item.disabled=(this.productIdByInput!=item.productId && item.productId);
+                item.disabled=(this.productIdByInput==item.productId);
               });
               resolve(response);
             });

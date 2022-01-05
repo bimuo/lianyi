@@ -1,10 +1,10 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="产品图号" prop="productName">
+      <el-form-item label="产品名称" prop="productId">
         <el-input
-          v-model="queryParams.productName"
-          placeholder="请输入产品图号"
+          v-model="queryParams.productId"
+          placeholder="请输入产品名称"
           clearable
           size="small"
           @keyup.enter.native="handleQuery"
@@ -17,6 +17,16 @@
     </el-form>
 
     <el-row :gutter="10" class="mb8">
+      <el-col :span="1.5">
+        <el-button
+          type="primary"
+          plain
+          icon="el-icon-plus"
+          size="mini"
+          @click="handleAdd"
+          v-hasPermi="['system:storelog:add']"
+        >新增</el-button>
+      </el-col>
       <el-col :span="1.5">
         <el-button
           type="danger"
@@ -124,7 +134,6 @@ export default {
         pageSize: 10,
         type: null,
         productId: null,
-        productName: null,
         shelvesCellId: null,
       },
       // 表单参数
@@ -158,7 +167,6 @@ export default {
         id: null,
         type: null,
         productId: null,
-        productName: null,
         shelvesCellId: null,
         count: null,
         createTime: null

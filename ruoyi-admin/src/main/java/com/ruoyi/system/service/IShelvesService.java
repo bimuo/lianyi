@@ -35,6 +35,8 @@ public interface IShelvesService
      * @return 货架集合
      */
     public List<SelectTreeValue> getShelvesTree();
+    
+    public List<SelectTreeValue> getChildrenShelvesTree(Long id);
 
     /**
      * 新增货架

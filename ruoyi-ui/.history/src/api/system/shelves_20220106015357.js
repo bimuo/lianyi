@@ -16,9 +16,9 @@ export function treeShelves() {
   })
 }
 // 查询货架树
-export function treeChildrenShelves(id) {
+export function treeChildrenShelves() {
   return request({
-    url: '/system/shelves/children-tree/'+id,
+    url: '/system/shelves/children-tree',
     method: 'get'
   })
 }

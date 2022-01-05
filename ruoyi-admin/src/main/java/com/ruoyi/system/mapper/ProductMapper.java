@@ -36,6 +36,7 @@ public interface ProductMapper
      */
     public List<Product> selectProductList(Product product);
 
+    public List<Product> selectrepeatProductList(Product product);
     /**
      * 新增商品
      * 

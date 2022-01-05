@@ -173,7 +173,6 @@
           style="width: 100%;margin-bottom: 20px;"
           row-key="id"
           border
-          default-expand-all="true"
           show-summary
           :tree-props="{children: 'children'}">
           <el-table-column
@@ -255,19 +254,23 @@ export default {
       shelvesTreeProps: {
         lazy: true,
         lazyLoad (node, resolve) {
-          const { level,root,data } = node;
+          const { level,root } = node;
+          debugger
           if(root){
             treeShelves().then((response) => {
+              this.openInput = true;
+              this.title = "入库商品";
               response.map(item=>{
-                item.leaf=false;
+                item.left=false;
               });
               resolve(response);
             });
           }else{
-            treeChildrenShelves(data.value).then((response) => {
+            treeChildrenShelves().then((response) => {
+              this.openInput = true;
+              this.title = "入库商品";
               response.map(item=>{
-                item.leaf=true;
-                item.disabled=(this.productIdByInput!=item.productId && item.productId);
+                item.left=false;
               });
               resolve(response);
             });

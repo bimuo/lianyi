@@ -145,10 +145,10 @@
     <!-- 商品入库对话框对话框 -->
     <el-dialog :title="title" :visible.sync="openInput" width="500px" append-to-body>
       <el-form ref="formInput" :model="formInput" :rules="rulesInput" label-width="80px">
-        <el-form-item label="货架" prop="shelvesCellId">
+        <el-form-item label="货架" prop="shelves">
           <el-cascader
-            :props="shelvesTreeProps"
             v-model="formInput.shelvesCellId"
+            :options="shelvesOptions"
             separator="-"
             :emitPath="true"
             filterable
@@ -173,7 +173,6 @@
           style="width: 100%;margin-bottom: 20px;"
           row-key="id"
           border
-          default-expand-all="true"
           show-summary
           :tree-props="{children: 'children'}">
           <el-table-column
@@ -208,7 +207,7 @@
 
 <script>
 import { listProduct, getProduct, delProduct, addProduct, updateProduct, getProductStore, output } from "@/api/system/product";
-import { treeShelves,treeChildrenShelves } from "@/api/system/shelves";
+import { treeShelves } from "@/api/system/shelves";
 import { addProductshelves } from "@/api/system/productshelves";
 export default {
   name: "Product",
@@ -252,51 +251,15 @@ export default {
       formInput: {},
       formOutput: {},
       shelvesOptions: [],
-      shelvesTreeProps: {
-        lazy: true,
-        lazyLoad (node, resolve) {
-          const { level,root,data } = node;
-          if(root){
-            treeShelves().then((response) => {
-              response.map(item=>{
-                item.leaf=false;
-              });
-              resolve(response);
-            });
-          }else{
-            treeChildrenShelves(data.value).then((response) => {
-              response.map(item=>{
-                item.leaf=true;
-                item.disabled=(this.productIdByInput!=item.productId && item.productId);
-              });
-              resolve(response);
-            });
-          }
-        }
-      },
       // 表单校验
       rules: {
       },
       rulesInput:{
-        shelvesCellId:[
-        {
-          required: true,
-          message: '货架不能为空'
-        },{
-          type:'array',
-          required: true,
-          message: '货架不能为空',
-          trigger:'change'
-        }
-        ],
         count:[{
           type: 'number',
           min: 0,
           message: '请填写正确数值',
           trigger: 'blur'
-        },{
-          required: true,
-          message: '数量不能为空'
         }]
       },
       rulesOutput: {
@@ -388,12 +351,18 @@ export default {
     handleInput(row) {
       this.reset();
       const id = row.id || this.ids
-      this.productIdByInput = id;
       this.formInput.productId=id;
-      this.openInput = true;
-      this.title = "入库商品";
+      if(this.shelvesOptions.length>0){
+        this.openInput = true;
+        this.title = "入库商品";
+        return;
+      }
+      treeShelves().then((response) => {
+        this.openInput = true;
+        this.title = "入库商品";
+        this.shelvesOptions=response;
+      });
     },
-
     /** 出库按钮操作 */
     handleOutput(row) {
       this.reset();

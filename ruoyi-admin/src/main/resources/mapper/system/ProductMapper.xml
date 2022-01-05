@@ -66,7 +66,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			c.name,
 			ps.count,
 			ps.product_id as productId,
-			c.shelves_id as shelvesId
+			c.id as shelvesId
 		FROM
 			product_shelves ps,shelves_cell c
 		WHERE
@@ -89,6 +89,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <where>  
             <if test="drawNumber != null  and drawNumber != ''"> and p.draw_number like concat('%', #{drawNumber}, '%')</if>
             <if test="specifications != null  and specifications != ''"> and p.specifications like concat('%', #{specifications}, '%')</if>
+        </where>
+    </select>
+    
+    <select id="selectrepeatProductList" parameterType="Product" resultMap="ProductResult">
+       select id, draw_number, specifications, unit, remark, create_time, update_time from product
+        <where>  
+            draw_number = #{drawNumber}
+            and specifications = #{specifications}
         </where>
     </select>
     
