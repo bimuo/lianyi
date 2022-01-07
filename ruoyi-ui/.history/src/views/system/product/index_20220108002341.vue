@@ -497,6 +497,6 @@ export default {
 </script>
 <style scoped lang="scss">
   .blue-select {
-    color: #ff5100;
+    color: '#0000CC';
   }
 </style>

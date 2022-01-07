@@ -147,19 +147,13 @@
       <el-form ref="formInput" :model="formInput" :rules="rulesInput" label-width="80px">
         <el-form-item label="货架" prop="shelvesCellId">
           <el-cascader
-            :key="productIdByInput"
             :props="shelvesTreeProps"
             v-model="formInput.shelvesCellId"
             separator="-"
             :emitPath="true"
             filterable
             clearable
-            >
-            <template slot-scope="{ data }">
-              <span v-if="productIdByInput==data.productId && data.productId && data.leaf" class="blue-select">{{ data.label+'('+data.count+')' }}</span>
-              <span v-else>{{ data.label }}</span>
-            </template>
-            </el-cascader>
+            ></el-cascader>
         </el-form-item>
         <el-form-item label="数量" prop="count">
           <el-input v-model.number="formInput.count" placeholder="请输入数量" />
@@ -175,6 +169,7 @@
     <el-dialog :title="title" :visible.sync="openOutput" width="500px" append-to-body>
       <el-form ref="formOutput" :model="formOutput" :rules="rulesOutput" label-width="80px">
         <el-table
+          ref="cascader"
           :data="productStroe"
           style="width: 100%;margin-bottom: 20px;"
           row-key="id"
@@ -240,7 +235,6 @@ export default {
       // 商品表格数据
       productList: [],
       productStroe: [],
-      productIdByInput: null,
       // 弹出层标题
       title: "",
       // 是否显示弹出层
@@ -310,6 +304,7 @@ export default {
               response.map(item=>{
                 item.leaf=true;
                 item.disabled=(_this.productIdByInput!=item.productId && item.productId);
+                item.label=((_this.productIdByInput==item.productId && item.productId)?item.label+'[' +item.count+']':item.label)
               });
               resolve(response);
             });
@@ -359,6 +354,7 @@ export default {
         count: null,
         productId: null
       }
+      this.$refs.cascader.clearCheckedNodes();
       this.resetForm("formInput");
     },
     /** 搜索按钮操作 */
@@ -495,8 +491,3 @@ export default {
   }
 };
 </script>
-<style scoped lang="scss">
-  .blue-select {
-    color: #ff5100;
-  }
-</style>

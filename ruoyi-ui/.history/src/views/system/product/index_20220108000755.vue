@@ -154,12 +154,7 @@
             :emitPath="true"
             filterable
             clearable
-            >
-            <template slot-scope="{ data }">
-              <span v-if="productIdByInput==data.productId && data.productId && data.leaf" class="blue-select">{{ data.label+'('+data.count+')' }}</span>
-              <span v-else>{{ data.label }}</span>
-            </template>
-            </el-cascader>
+            ></el-cascader>
         </el-form-item>
         <el-form-item label="数量" prop="count">
           <el-input v-model.number="formInput.count" placeholder="请输入数量" />
@@ -310,6 +305,7 @@ export default {
               response.map(item=>{
                 item.leaf=true;
                 item.disabled=(_this.productIdByInput!=item.productId && item.productId);
+                item.label=((_this.productIdByInput==item.productId && item.productId)?item.label+'[' +item.count+']':item.label)
               });
               resolve(response);
             });
@@ -495,8 +491,3 @@ export default {
   }
 };
 </script>
-<style scoped lang="scss">
-  .blue-select {
-    color: #ff5100;
-  }
-</style>

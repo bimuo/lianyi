@@ -156,7 +156,7 @@
             clearable
             >
             <template slot-scope="{ data }">
-              <span v-if="productIdByInput==data.productId && data.productId && data.leaf" class="blue-select">{{ data.label+'('+data.count+')' }}</span>
+              <span v-if="productIdByInput==data.productId && data.productId && data.leaf">{{ data.label+'('+data.count+')' }}</span>
               <span v-else>{{ data.label }}</span>
             </template>
             </el-cascader>
@@ -310,6 +310,7 @@ export default {
               response.map(item=>{
                 item.leaf=true;
                 item.disabled=(_this.productIdByInput!=item.productId && item.productId);
+                // item.label=((_this.productIdByInput==item.productId && item.productId)?item.label+'[' +item.count+']':item.label)
               });
               resolve(response);
             });
@@ -495,8 +496,3 @@ export default {
   }
 };
 </script>
-<style scoped lang="scss">
-  .blue-select {
-    color: #ff5100;
-  }
-</style>

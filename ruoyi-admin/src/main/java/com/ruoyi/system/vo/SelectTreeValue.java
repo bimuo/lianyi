@@ -7,8 +7,17 @@ public class SelectTreeValue {
 	private Long productId;
 	private String label;
 	private String value;
+	private int count;
 	private boolean disabled;
 	private List<SelectTreeValue> children;
+
+	public int getCount() {
+		return count;
+	}
+
+	public void setCount(int count) {
+		this.count = count;
+	}
 
 	public Long getProductId() {
 		return productId;
